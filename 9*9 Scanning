@@ -1,0 +1,27 @@
+package practicepackage;
+
+import java.util.Scanner;
+
+public class Scan99 {
+	public static void main(String[] args) {
+		Scanner scan = new Scanner(System.in);
+		int i = 0;
+		int j = 0;
+		System.out.print("Input:");
+		i = scan.nextInt();
+		System.out.print("Input:");
+		l = scan.nextInt();
+		for (int k = 1; k <= i; k++) {
+			for (int l = 1; l <= j; l++) {
+				System.out.print(j + "*" + k + "=" + j * k + "\t");
+			}
+			System.out.println();
+		}
+	}
+}
+
+/*My First 9*9 Scanner
+
+Finally, I made something from Basic JAVA knowledge I learned.
+Still, I have a long way to go...
+*/
