@@ -1623,3 +1623,47 @@ public class AppdataDAO extends SQLiteOpenHelper {
 </selector>
 ========================================================================================================================================
 
+========================================================================================================================================
+<values/strings.xml>
+----------------------------------------------------------------------------------------------------------------------------------------
+<resources>
+    <string name="app_name">Codebook</string>
+    <string name="Menutextupper">Welcome to</string>
+    <string name="Menutextlower">The CodeBook!</string>
+    <string name="TODO">NA</string>
+    <string name="ACtitle">Add New Code</string>
+    <string name="UCtitle">Update Code</string>
+    <string name="UDtitle">Update/Delete Code</string>
+    <string name="Note">Note</string>
+    <string name="Id">ID</string>
+    <string name="Password">Pass</string>
+    <string name="Add">ADD NEW CODE</string>
+    <string name="GB">CLOSE</string>
+    <string name="addcodenotice">Notice!</string>
+    <string name="addcodetext1">*반드시 모든 항목을 채워넣어야 하며, 빈 항목</string>
+    <string name="addcodetext2">이 하나라도 있을 시 등록이 되지 않습니다</string>
+    <string name="addcodetext3">**NOTE에는 아이디와 비밀번호를 사용되는</string>
+    <string name="addcodetext4">사이트에 대해서 쓰는 것을 권장합니다.</string>
+</resources>
+========================================================================================================================================
+
+========================================================================================================================================
+<values/styles.xml>
+----------------------------------------------------------------------------------------------------------------------------------------
+<resources>
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+    <style name="Notitle" parent="Base.Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+</resources>
+========================================================================================================================================
