@@ -1,0 +1,1625 @@
+/*<The Codebook App>
+제 생애 최초로 만든 안드로이드 앱입니다. 
+
+-제작 기간
+2018.12.5 ~ 2018.12.14(9일)
+
+-앱의 개발 동기와 목적
+이번 프로젝트 때 무엇을 만들까 고민하다가 평소에 안쓰던 아이디와 비밀번호를 찾느라 몇 번 있었던 일이 생각나서
+이럴 때 쓸 앱을 만들어야 겠다 싶어서 이 앱을 만들기로 결정했습니다.
+각종 아이디와 비밀번호를 노트(아이디와 비밀번호에 관련된 정보),아이디,비밀번호 순서로 리스트 형식으로 
+저장하는 것을 목적으로 개발했습니다.
+
+-개발 환경
+개발 툴: Android Studio 3.2.1
+프로그래밍 언어:ava
+에뮬레이터: Genymotion 2.2.1(Galaxy S8/API 26 - Oreo)
+사진 편집: 그림판, 알씨 
+
+-후기 
+이번 앱을 개발하면서 디지인을 대강 어떻게 하는지를 감을 잡았고 안드로이드의 DB를 다루는 방법, 
+그리고 클릭 시 얼럿창이 뜨는 리스트뷰에 2개 이상의 항목을 클릭해도 에러가 안뜨게 하는 방법을 스스로 알아낼 수 있었기에
+어느 정도 성취감을 느낄 수 있었습니다.
+아쉬운 점이 몇가지 있다면 이러한 앱들은 보안의 필수적이라고 봐도 불구하고 구현의 어려움과 시간 부족으로 
+추가하지 못했다는 점과 여전히 디자인이 뭔가 엉성하다는 느낌을 준다는 점이였습니다.
+*/
+
+<Sourcecodes for The Application>
+========================================================================================================================================
+<MainActivity.java>
+----------------------------------------------------------------------------------------------------------------------------------------
+package sudend48.google.com.codebookapp;
+
+import android.content.Intent;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
+
+public class MainActivity extends AppCompatActivity {
+    ImageView start;
+    ImageView close;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        start = findViewById(R.id.startbtn);
+        close = findViewById(R.id.closebtn);
+        start.setOnClickListener(click);
+        close.setOnClickListener(click);
+    }
+    Button.OnClickListener click = new Button.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()) {
+                case R.id.startbtn:
+                    Intent startintent = new Intent(MainActivity.this,CodelistActivity.class);
+                    startActivity(startintent);
+                    break;
+                case R.id.closebtn:
+                    moveTaskToBack(true);
+                    finish();
+                    android.os.Process.killProcess(android.os.Process.myPid());
+                    break;
+            }
+        }
+    };
+}
+========================================================================================================================================
+
+========================================================================================================================================
+<activity_main.xml>
+----------------------------------------------------------------------------------------------------------------------------------------
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="@drawable/mainbg"
+        android:orientation="vertical">
+        <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/menupicture"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="40dp"
+            android:src="@drawable/lockedbook"
+            app:civ_border_color="#FF000000"
+            app:civ_border_width="3dp" />
+        <FrameLayout
+            android:id="@+id/menubg"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="20dp"
+            android:baselineAligned="false"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="fill_parent"
+                android:layout_height="150dp"
+                android:longClickable="true"
+                android:scaleType="centerCrop"
+                android:src="@drawable/titleframe"
+                android:contentDescription="@string/TODO"  />
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/menutextupper"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/Menutextupper"
+                    android:textAlignment="center"
+                    android:textAllCaps="false"
+                    android:textColor="#000"
+                    android:textSize="55sp" />
+
+                <TextView
+                    android:id="@+id/menutextlower"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/Menutextlower"
+                    android:textAlignment="center"
+                    android:textAllCaps="false"
+                    android:textColor="#FFE146"
+                    android:textSize="50sp" />
+            </LinearLayout>
+        </FrameLayout>
+        <LinearLayout
+            android:id="@+id/buttonlayout"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="120dp"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/startbtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="60dp"
+                android:layout_marginRight="60dp"
+                android:clickable="true"
+                android:contentDescription="@string/TODO"
+                android:focusable="true"
+                android:src="@drawable/startbtn" />
+
+            <ImageView
+                android:id="@+id/closebtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:contentDescription="@string/TODO"
+                android:focusable="true"
+                android:src="@drawable/closebtn" />
+        </LinearLayout>
+    </LinearLayout>
+</android.support.constraint.ConstraintLayout>
+========================================================================================================================================
+
+========================================================================================================================================
+<CodelistActivity.java>
+----------------------------------------------------------------------------------------------------------------------------------------
+package sudend48.google.com.codebookapp;
+
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.ListAdapter;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
+import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+
+public class CodelistActivity extends AppCompatActivity {
+    ImageView addbtn;
+    ImageView closelistbtn;
+    ImageView clearlistbtn;
+    ListView codelist;
+    Context context;
+
+    View updateLayout;
+    LayoutInflater inflater;
+    AlertDialog updateDialog;
+
+    EditText Pk;
+    EditText Noteedit;
+    EditText Idedit;
+    EditText Passwordedit;
+    ImageView updatebtn;
+    ImageView deletebtn;
+    ImageView closeupdatebtn;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_codelist);
+        addbtn = findViewById(R.id.addbtn);
+        closelistbtn = findViewById(R.id.closelistbtn);
+        clearlistbtn = findViewById(R.id.clearlistbtn);
+        codelist = findViewById(R.id.codelist);
+        addbtn.setOnClickListener(click);
+        closelistbtn.setOnClickListener(click);
+        clearlistbtn.setOnClickListener(click);
+        context = CodelistActivity.this;
+        inflater = getLayoutInflater();
+        updateLayout = inflater.inflate(R.layout.activity_updatecode, null);
+        Pk = updateLayout.findViewById(R.id.pk);
+        Noteedit = updateLayout.findViewById(R.id.Noteupdate);
+        Idedit = updateLayout.findViewById(R.id.Idupdate);
+        Passwordedit = updateLayout.findViewById(R.id.Passwordupdate);
+        AppdataDAO obj = new AppdataDAO(this);
+        SQLiteDatabase db = obj.getReadableDatabase();
+        String sql = "select * from codedata";
+        Cursor cursor = db.rawQuery(sql, null);
+        final ArrayList<HashMap<String, String>> Codelist = new ArrayList<>();
+        HashMap<String, String> data;
+        while (cursor.moveToNext()) {
+            data = new HashMap<>();
+            data.put("_id", cursor.getString(0));
+            data.put("note", cursor.getString(1));
+            data.put("id", cursor.getString(2));
+            data.put("password", cursor.getString(3));
+            Codelist.add(data);
+        }
+        cursor.close();
+        db.close();
+        obj.close();
+        ListAdapter adapter = new SimpleAdapter(CodelistActivity.this, Codelist, R.layout.code_list_row,
+                new String[]{"_id", "note"},
+                new int[]{R.id.rowid, R.id.rownote});
+        codelist.setAdapter(adapter);
+        codelist.setClickable(true);
+        codelist.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Showcodelist(Codelist.get(position).get("_id"));
+            }
+        });
+    }
+
+    Button.OnClickListener click = new Button.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()) {
+                case R.id.closelistbtn:
+                    finish();
+                    break;
+                case R.id.addbtn:
+                    Intent addintent = new Intent(CodelistActivity.this, AddCodeActivity.class);
+                    startActivityForResult(addintent, 101);
+                    break;
+                case R.id.clearlistbtn:
+                    clearlist();
+                    break;
+            }
+        }
+    };
+
+    private void Showcodelist(String selected) {
+        AppdataDAO obj = new AppdataDAO(this);
+        SQLiteDatabase db = obj.getReadableDatabase();
+        int key = Integer.parseInt(selected);
+        String sql = "select * from codedata where _id=" + key + " ";
+        Cursor cursor = db.rawQuery(sql, null);
+        CodelistBean data = new CodelistBean();
+        if (cursor.moveToNext()) {
+            data.set_id(cursor.getInt(0));
+            data.setNote(cursor.getString(1));
+            data.setId(cursor.getString(2));
+            data.setPassword(cursor.getString(3));
+        }
+        cursor.close();
+        db.close();
+        obj.close();
+        Pk.setText(data.get_id() + "");
+        Noteedit.setText(data.getNote());
+        Idedit.setText(data.getId());
+        Passwordedit.setText(data.getPassword());
+
+        updatebtn = updateLayout.findViewById(R.id.updateconfirmbtn);
+        deletebtn = updateLayout.findViewById(R.id.deleteupdatebtn);
+        closeupdatebtn = updateLayout.findViewById(R.id.closeupdatebtn);
+
+        updatebtn.setOnClickListener(updateclick);
+        deletebtn.setOnClickListener(updateclick);
+        closeupdatebtn.setOnClickListener(updateclick);
+
+        View titleview = inflater.inflate(R.layout.activity_udcustom_view, null);
+        AlertDialog.Builder updatewindow = new AlertDialog.Builder(context);
+        updatewindow.setCustomTitle(titleview);
+        updatewindow.setView(updateLayout);
+        updatewindow.setCancelable(false);
+        updateDialog = updatewindow.create();
+        if (updateLayout.getParent() != null) {
+            ((ViewGroup)updateLayout.getParent()).removeView(updateLayout);}
+        updateDialog.show();
+    }
+    Button.OnClickListener updateclick = new Button.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()) {
+                case R.id.updateconfirmbtn:
+                    Codeupdate();
+                    break;
+                case R.id.deleteupdatebtn:
+                    Codedelete();
+                    break;
+                case R.id.closeupdatebtn:
+                    updateDialog.dismiss();
+                    break;
+            }
+        }
+    };
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 101 | resultCode == 101) {
+            showagain();
+        }
+    }
+    public void showagain() {
+        AppdataDAO obj = new AppdataDAO(this);
+        SQLiteDatabase db = obj.getReadableDatabase();
+        String sql = "select * from codedata";
+        Cursor cursor = db.rawQuery(sql, null);
+        final ArrayList<HashMap<String, String>> Codelist = new ArrayList<>();
+        HashMap<String, String> data;
+        while (cursor.moveToNext()) {
+            data = new HashMap<>();
+            data.put("_id", cursor.getString(0));
+            data.put("note", cursor.getString(1));
+            data.put("id", cursor.getString(2));
+            data.put("password", cursor.getString(3));
+            Codelist.add(data);
+        }
+        cursor.close();
+        db.close();
+        obj.close();
+        ListAdapter adapter = new SimpleAdapter(CodelistActivity.this, Codelist, R.layout.code_list_row,
+                new String[]{"_id", "note"},
+                new int[]{R.id.rowid, R.id.rownote});
+        codelist.setAdapter(adapter);
+        codelist.setClickable(true);
+        codelist.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Showcodelist(Codelist.get(position).get("_id"));
+            }
+        });
+    }
+
+    private void Codeupdate() {
+        AlertDialog.Builder alt_bld = new AlertDialog.Builder(this);
+        alt_bld.setMessage("수정하시겠습니까 ?").setCancelable(false)
+                .setPositiveButton("No",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        }).setNegativeButton("Yes",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        CodeupdateDB();
+                        dialog.cancel();
+                    }
+                });
+        AlertDialog alert = alt_bld.create();
+        alert.setTitle("Update code");
+        alert.setIcon(R.drawable.updateicon);
+        alert.show();
+    }
+    private void CodeupdateDB() {
+        AppdataDAO obj = new AppdataDAO(this);
+        SQLiteDatabase db = obj.getWritableDatabase();
+        int key = Integer.parseInt(Pk.getText().toString());
+        StringBuilder sql = new StringBuilder();
+        sql.append("update codedata set ");
+        sql.append("note='" + Noteedit.getText().toString() + "',");
+        sql.append("id='" + Idedit.getText().toString() + "',");
+        sql.append("password='" + Passwordedit.getText().toString() + "' ");
+        sql.append("where _id=" + key + " ");
+        db.execSQL(sql.toString());
+        db.close();
+        obj.close();
+        Toast.makeText(context, "Code changed", Toast.LENGTH_SHORT).show();
+        updateDialog.dismiss();
+        showagain();
+    }
+    private void Codedelete() {
+        AlertDialog.Builder alt_bld = new AlertDialog.Builder(this);
+        alt_bld.setMessage("정말로 삭제하시겠습니까?").setCancelable(false)
+                .setPositiveButton("No",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        }).setNegativeButton("Yes",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        CodedeleteDB();
+                        dialog.cancel();
+                    }
+                });
+        AlertDialog alert = alt_bld.create();
+        alert.setTitle("Delete code");
+        alert.setIcon(R.drawable.updateicon);
+        alert.show();
+    }
+    private void CodedeleteDB() {
+        AppdataDAO obj = new AppdataDAO(this);
+        SQLiteDatabase db = obj.getWritableDatabase();
+        int key = Integer.parseInt(Pk.getText().toString());
+        StringBuilder sql = new StringBuilder();
+        sql.append("delete from codedata ");
+        sql.append("where _id=" + key + " ");
+        db.execSQL(sql.toString());
+        db.close();
+        obj.close();
+        Toast.makeText(context, "Code deleted", Toast.LENGTH_SHORT).show();
+        updateDialog.dismiss();
+        showagain();
+    }
+    private void clearlist() {
+        AlertDialog.Builder alt_bld = new AlertDialog.Builder(this);
+        alt_bld.setMessage("정말로 목록을 삭제하시겠습니까 ?").setCancelable(false)
+                .setPositiveButton("No",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        }).setNegativeButton("Yes",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        clearlistDB();
+                        dialog.cancel();
+                    }
+                });
+        AlertDialog alert = alt_bld.create();
+        alert.setTitle("Clear Codelist");
+        alert.setIcon(R.drawable.updateicon);
+        alert.show();
+    }
+    private void clearlistDB() {
+        AppdataDAO obj = new AppdataDAO(this);
+        SQLiteDatabase db = obj.getWritableDatabase();
+        String sql = "drop table if exists codedata";
+        db.execSQL(sql);
+        StringBuilder sb = new StringBuilder();
+        sb.append("create table codedata (_id INTEGER PRIMARY KEY AUTOINCREMENT,");
+        sb.append("note varchar,id varchar,password varchar)");
+        db.execSQL(sb.toString());
+        db.close();
+        obj.close();
+        Toast.makeText(context, "List Cleared", Toast.LENGTH_SHORT).show();
+        updateDialog.dismiss();
+        showagain();
+    }
+}
+========================================================================================================================================
+
+========================================================================================================================================
+<activity_codelist.xml>
+----------------------------------------------------------------------------------------------------------------------------------------
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".CodelistActivity">
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical"
+        android:weightSum="10">
+        <ListView
+            android:id="@+id/codelist"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="8">
+        </ListView>
+        <LinearLayout
+            android:id="@+id/listbutton"
+            android:layout_width="fill_parent"
+            android:layout_height="80dp"
+            android:orientation="horizontal"
+            android:layout_weight="2"
+            android:weightSum="3"
+            >
+            <ImageView
+                android:id="@+id/addbtn"
+                android:layout_width="fill_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:clickable="true"
+                android:layout_weight="1"
+                android:contentDescription="@string/TODO"
+                android:scaleType="centerCrop"
+                android:src="@drawable/addbtn" />
+            <ImageView
+                android:id="@+id/clearlistbtn"
+                android:layout_width="fill_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:clickable="true"
+                android:layout_weight="1"
+                android:contentDescription="@string/TODO"
+                android:scaleType="centerCrop"
+                android:src="@drawable/clearbtn"/>
+            <ImageView
+                android:id="@+id/closelistbtn"
+                android:layout_width="fill_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:clickable="true"
+                android:layout_weight="1"
+                android:contentDescription="@string/TODO"
+                android:scaleType="centerCrop"
+                android:src="@drawable/closelistbtn" />
+        </LinearLayout>
+    </LinearLayout>
+</android.support.constraint.ConstraintLayout>
+========================================================================================================================================
+
+========================================================================================================================================
+<code_list_row.xml>
+----------------------------------------------------------------------------------------------------------------------------------------
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="50dp"
+    android:layout_gravity="center"
+    android:orientation="horizontal">
+    <FrameLayout
+        android:layout_width="40dp"
+        android:layout_height="50dp">
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/TODO"
+            android:scaleType="centerCrop"
+            android:src="@drawable/rowclick1" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <TextView
+                android:id="@+id/rowid"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:textAlignment="center"
+                android:textSize="25sp" />
+        </LinearLayout>
+    </FrameLayout>
+    <LinearLayout
+        android:layout_width="20dp"
+        android:layout_height="50dp"></LinearLayout>
+    <FrameLayout
+        android:layout_width="300dp"
+        android:layout_height="50dp">
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/TODO"
+            android:scaleType="centerCrop"
+            android:src="@drawable/rowclick2" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="10dp">
+            <TextView
+                android:id="@+id/rownote"
+                android:layout_width="260dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical"
+                android:gravity="center_vertical"
+                android:textSize="25sp" />
+            <TextView
+                android:layout_width="30dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center" />
+        </LinearLayout>
+    </FrameLayout>
+</LinearLayout>
+========================================================================================================================================
+
+========================================================================================================================================
+<AddCodeActivity.java>
+----------------------------------------------------------------------------------------------------------------------------------------
+package sudend48.google.com.codebookapp;
+
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+
+public class AddCodeActivity extends AppCompatActivity {
+
+    ImageView addconfirmbtn;
+    ImageView closeaddbtn;
+    EditText Note;
+    EditText Id;
+    EditText Password;
+    Context context;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_add_code);
+        addconfirmbtn = findViewById(R.id.addconfirmbtn);
+        closeaddbtn = findViewById(R.id.closeaddbtn);
+        Note = findViewById(R.id.Note);
+        Id = findViewById(R.id.Id);
+        Password = findViewById(R.id.Password);
+        context = AddCodeActivity.this;
+        addconfirmbtn.setOnClickListener(addclick);
+        closeaddbtn.setOnClickListener(addclick);
+    }
+    Button.OnClickListener addclick = new Button.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()) {
+                case R.id.addconfirmbtn:
+                    Insertcode();
+                    break;
+                case R.id.closeaddbtn:
+                    finish();
+                    break;
+            }
+        }
+    };
+    private void Insertcode() {
+        String chkmsg = "-다음 사항을 입력해주세요!-\n\n";
+        if (Note.getText().toString().equals(""))
+            chkmsg +="노트\n";
+        if (Id.getText().toString().equals(""))
+            chkmsg +="아이디\n";
+        if (Password.getText().toString().equals(""))
+            chkmsg +="비밀번호\n";
+        AlertDialog.Builder insertdialog= new AlertDialog.Builder(context);
+        if(chkmsg.equals("-다음 사항을 입력해주세요!-\n\n")) {
+            insertdialog.setMessage("저장하시겠습니까?");
+            insertdialog.setCancelable(false);
+            insertdialog.setPositiveButton("취소", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
+            insertdialog.setNegativeButton("확인", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    insertDB();
+                }
+            });
+        } else  {
+            insertdialog.setMessage(chkmsg);
+            insertdialog.setCancelable(false);
+            insertdialog.setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                    return;
+                }
+            });
+        }
+        AlertDialog insertalert = insertdialog.create();
+        insertalert.setIcon(R.drawable.updateicon);
+        insertalert.show();
+    }
+    private void insertDB() {
+        AppdataDAO obj = new AppdataDAO(this);
+        SQLiteDatabase db = obj.getWritableDatabase();
+        //입력할 DB 명령어
+        StringBuilder sql = new StringBuilder();
+        sql.append("insert into codedata(");
+        sql.append("note,id,password");
+        sql.append(")values(");
+        sql.append(" '"+ Note.getText().toString()+"',");
+        sql.append(" '"+ Id.getText().toString()+"',");
+        sql.append(" '"+ Password.getText().toString()+"'");
+        sql.append(")");
+        try {
+            db.execSQL(sql.toString());
+            Intent insertintent = new Intent();
+            setResult(101,insertintent);
+            finish();
+        } catch (Exception e) {
+            Log.d("DB insert err:",e.getMessage());
+        }
+    }
+}
+========================================================================================================================================
+
+========================================================================================================================================
+<activity_add_code.xml>
+----------------------------------------------------------------------------------------------------------------------------------------
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".AddCodeActivity">
+    <!--master layout-->
+    <LinearLayout
+        android:layout_width="360dp"
+        android:layout_height="fill_parent"
+        android:background="@drawable/mainbg"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:weightSum="5">
+        <!--warning layout on first row-->
+        <FrameLayout
+            android:id="@+id/warningframe"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:layout_marginBottom="40dp"
+            android:layout_weight="1">
+
+            <ImageView
+                android:id="@+id/warningbg"
+                android:layout_width="280dp"
+                android:layout_height="150dp"
+                android:contentDescription="@string/TODO"
+                android:scaleType="centerCrop"
+                android:src="@drawable/titleframe" />
+
+            <RelativeLayout
+                android:id="@+id/warnmsg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/notice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/addcodenotice"
+                    android:textColor="#f00"
+                    android:textSize="30sp" />
+
+                <TextView
+                    android:id="@+id/text1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/notice"
+                    android:text="@string/addcodetext1"
+                    android:textColor="#f00"
+                    android:textSize="15sp"
+                    android:textStyle="normal" />
+
+                <TextView
+                    android:id="@+id/text2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/text1"
+                    android:text="@string/addcodetext2"
+                    android:textColor="#f00"
+                    android:textSize="15sp"
+                    android:textStyle="normal" />
+                <TextView
+                    android:id="@+id/text3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/text2"
+                    android:text="@string/addcodetext3"
+                    android:textColor="#f00"
+                    android:textSize="15sp"
+                    android:textStyle="normal"/>
+                <TextView
+                    android:id="@+id/text4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/text3"
+                    android:text="@string/addcodetext4"
+                    android:textColor="#f00"
+                    android:textSize="15sp"
+                    android:textStyle="normal"/>
+            </RelativeLayout>
+        </FrameLayout>
+        <!--end warning layout on first row-->
+        <!--inputlayout on second row-->
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="168dp"
+            android:layout_gravity="center"
+            android:layout_weight="3"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:orientation="horizontal">
+
+                <FrameLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center">
+
+                    <ImageView
+                        android:id="@+id/inputbg11"
+                        android:layout_width="60dp"
+                        android:layout_height="48dp"
+                        android:contentDescription="@string/TODO"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/textframe" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/note"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginRight="5dp"
+                            android:text="@string/Note"
+                            android:textAlignment="center"
+                            android:textAllCaps="true"
+                            android:textColor="#000"
+                            android:textSize="20sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </FrameLayout>
+
+                <FrameLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center">
+
+                    <ImageView
+                        android:id="@+id/inputbg12"
+                        android:layout_width="205dp"
+                        android:layout_height="48dp"
+                        android:contentDescription="@string/TODO"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/textframe" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <EditText
+                            android:id="@+id/Note"
+                            android:layout_width="wrap_content"
+                            android:layout_height="45dp"
+                            android:layout_marginLeft="6dp"
+                            android:layout_marginTop="2dp"
+                            android:ems="9" />
+                    </LinearLayout>
+                </FrameLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
+
+                <FrameLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:id="@+id/inputbg21"
+                        android:layout_width="60dp"
+                        android:layout_height="48dp"
+                        android:contentDescription="@string/TODO"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/textframe" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginTop="6dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="fill_parent"
+                            android:text="@string/Id"
+                            android:textAllCaps="true"
+                            android:textColor="#000"
+                            android:textSize="25sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </FrameLayout>
+
+                <FrameLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:layout_width="205dp"
+                        android:layout_height="48dp"
+                        android:contentDescription="@string/TODO"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/textframe" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <EditText
+                            android:id="@+id/Id"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="6dp"
+                            android:layout_marginTop="2dp"
+                            android:ems="9" />
+                    </LinearLayout>
+                </FrameLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
+
+                <FrameLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:layout_width="60dp"
+                        android:layout_height="48dp"
+                        android:contentDescription="@string/TODO"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/textframe" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="5dp"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginTop="10dp"
+                            android:text="@string/Password"
+                            android:textAllCaps="true"
+                            android:textColor="#000"
+                            android:textSize="20sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </FrameLayout>
+
+                <FrameLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:layout_width="205dp"
+                        android:layout_height="48dp"
+                        android:contentDescription="@string/TODO"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/textframe" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <EditText
+                            android:id="@+id/Password"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="6dp"
+                            android:layout_marginTop="2dp"
+                            android:ems="9" />
+                    </LinearLayout>
+                </FrameLayout>
+            </LinearLayout>
+            <!--end inputlayout on second row-->
+        </LinearLayout>
+        <!--buttonlayout on third row-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:baselineAligned="false"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/addconfirmbtn"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:contentDescription="@string/TODO"
+                android:scaleType="centerCrop"
+                android:src="@drawable/addconfirmbtn" />
+
+            <ImageView
+                android:id="@+id/closeaddbtn"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:contentDescription="@string/TODO"
+                android:scaleType="centerCrop"
+                android:src="@drawable/closelistbtn" />
+        </LinearLayout>
+        <!--end buttonlayout on third row-->
+    </LinearLayout>
+    <!--end masterlayout-->
+</android.support.constraint.ConstraintLayout>
+========================================================================================================================================
+
+========================================================================================================================================
+<UpdatecodeActivity.java>
+----------------------------------------------------------------------------------------------------------------------------------------
+package sudend48.google.com.codebookapp;
+
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+
+public class UpdatecodeActivity extends AppCompatActivity {
+    ImageView updateconfirmbtn;
+    ImageView deleteupdatebtn;
+    ImageView closeupdatebtn;
+    EditText Noteupdate;
+    EditText Idupdate;
+    EditText Passwordupdate;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_updatecode);
+        updateconfirmbtn = findViewById(R.id.updateconfirmbtn);
+        deleteupdatebtn = findViewById(R.id.deleteupdatebtn);
+        closeupdatebtn = findViewById(R.id.closeupdatebtn);
+        Noteupdate = findViewById(R.id.Noteupdate);
+        Idupdate = findViewById(R.id.Idupdate);
+        Passwordupdate = findViewById(R.id.Passwordupdate);
+        updateconfirmbtn.setOnClickListener(updateclick);
+        deleteupdatebtn.setOnClickListener(updateclick);
+        closeupdatebtn.setOnClickListener(updateclick);
+
+    }
+    Button.OnClickListener updateclick = new Button.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()) {
+                case R.id.updateconfirmbtn:
+                    break;
+                case R.id.deleteupdatebtn:
+                    break;
+                case R.id.closeupdatebtn:
+                    break;
+            }
+        }
+    };
+}
+========================================================================================================================================
+
+========================================================================================================================================
+<activity_updatecode.xml>
+----------------------------------------------------------------------------------------------------------------------------------------
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".UpdatecodeActivity">
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:gravity="center_horizontal"
+        android:background="@drawable/mainbg"
+        android:orientation="vertical">
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="168dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp"
+            android:orientation="vertical">
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:orientation="horizontal">
+                <FrameLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center">
+
+                    <ImageView
+                        android:id="@+id/inputbg11"
+                        android:layout_width="60dp"
+                        android:layout_height="48dp"
+                        android:contentDescription="@string/TODO"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/textframe" />
+                    <EditText
+                        android:id="@+id/pk"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"/>
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:orientation="horizontal">
+                        <TextView
+                            android:id="@+id/note"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginRight="5dp"
+                            android:text="@string/Note"
+                            android:textAlignment="center"
+                            android:textAllCaps="true"
+                            android:textColor="#000"
+                            android:textSize="20sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </FrameLayout>
+
+                <FrameLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center">
+
+                    <ImageView
+                        android:id="@+id/inputbg12"
+                        android:layout_width="205dp"
+                        android:layout_height="48dp"
+                        android:contentDescription="@string/TODO"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/textframe" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <EditText
+                            android:id="@+id/Noteupdate"
+                            android:layout_width="wrap_content"
+                            android:layout_height="45dp"
+                            android:layout_marginLeft="6dp"
+                            android:layout_marginTop="1dp"
+                            android:ems="9" />
+                    </LinearLayout>
+                </FrameLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
+
+                <FrameLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:id="@+id/inputbg21"
+                        android:layout_width="60dp"
+                        android:layout_height="48dp"
+                        android:contentDescription="@string/TODO"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/textframe" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginTop="6dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="fill_parent"
+                            android:text="@string/Id"
+                            android:textAllCaps="true"
+                            android:textColor="#000"
+                            android:textSize="25sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </FrameLayout>
+
+                <FrameLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:layout_width="205dp"
+                        android:layout_height="48dp"
+                        android:contentDescription="@string/TODO"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/textframe" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <EditText
+                            android:id="@+id/Idupdate"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="6dp"
+                            android:layout_marginTop="1dp"
+                            android:ems="9" />
+                    </LinearLayout>
+                </FrameLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
+
+                <FrameLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:layout_width="60dp"
+                        android:layout_height="48dp"
+                        android:contentDescription="@string/TODO"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/textframe" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="5dp"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginTop="10dp"
+                            android:text="@string/Password"
+                            android:textAllCaps="true"
+                            android:textColor="#000"
+                            android:textSize="20sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </FrameLayout>
+
+                <FrameLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:layout_width="205dp"
+                        android:layout_height="48dp"
+                        android:contentDescription="@string/TODO"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/textframe" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <EditText
+                            android:id="@+id/Passwordupdate"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="6dp"
+                            android:layout_marginTop="1dp"
+                            android:ems="9" />
+                    </LinearLayout>
+                </FrameLayout>
+            </LinearLayout>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal"
+            android:weightSum="3"
+            >
+            <ImageView
+                android:id="@+id/updateconfirmbtn"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:contentDescription="@string/TODO"
+                android:scaleType="centerCrop"
+                android:src="@drawable/updatebtn" />
+            <ImageView
+                android:id="@+id/deleteupdatebtn"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:contentDescription="@string/TODO"
+                android:scaleType="centerCrop"
+                android:src="@drawable/deletebtn" />
+            <ImageView
+                android:id="@+id/closeupdatebtn"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:contentDescription="@string/TODO"
+                android:scaleType="centerCrop"
+                android:src="@drawable/closelistbtn" />
+        </LinearLayout>
+    </LinearLayout>
+</android.support.constraint.ConstraintLayout>
+========================================================================================================================================
+
+========================================================================================================================================
+<CodelistBean.java>
+----------------------------------------------------------------------------------------------------------------------------------------
+package sudend48.google.com.codebookapp;
+
+public class CodelistBean {
+
+    public int get_id() {
+        return _id;
+    }
+
+    public void set_id(int _id) {
+        this._id = _id;
+    }
+
+    private int _id;
+    private String Note;
+    private String Id;
+    private String Password;
+
+    public String getNote() {
+        return Note;
+    }
+
+    public void setNote(String note) {
+        Note = note;
+    }
+
+    public String getId() {
+        return Id;
+    }
+
+    public void setId(String id) {
+        Id = id;
+    }
+
+    public String getPassword() {
+        return Password;
+    }
+
+    public void setPassword(String password) {
+        Password = password;
+    }
+}
+========================================================================================================================================
+
+========================================================================================================================================
+<activity_udcustom_view.xml>
+----------------------------------------------------------------------------------------------------------------------------------------
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+xmlns:android="http://schemas.android.com/apk/res/android"
+android:layout_width="match_parent"
+android:layout_height="match_parent">
+<FrameLayout
+    android:layout_width="match_parent"
+    android:layout_height="40dp">
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/mainbg"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_vertical">
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@string/UDtitle"
+            android:textAlignment="center"
+            android:textColor="#000"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+</FrameLayout>
+</LinearLayout>
+========================================================================================================================================
+
+========================================================================================================================================
+<AppdataDAO.java>
+----------------------------------------------------------------------------------------------------------------------------------------
+package sudend48.google.com.codebookapp;
+
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+
+public class AppdataDAO extends SQLiteOpenHelper {
+    private static final String DATABASE_NAME = "appdata.db";
+    private static final int DATABASE_VERSION = 1;
+    private Context mContext;
+    public AppdataDAO(Context context) {
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        mContext = context;
+    }
+    //새로 테이블을 생성시
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("create table codedata (_id INTEGER PRIMARY KEY AUTOINCREMENT,");
+        sb.append("note varchar,id varchar,password varchar)");
+        db.execSQL(sb.toString());
+    }
+    //기존의 테이블을 업데이트 할 시(database version을 바꿔줘야 작동)
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("create table codedata as select * from cpdata");
+        db.execSQL("drop table if exists codedata");
+        onCreate(db);
+        rewriteCopyMember(db);
+        db.execSQL("drop table if exists cpdata");
+    }
+    private void rewriteCopyMember(SQLiteDatabase db) {
+        StringBuilder sb;
+        String sql = "select * from cpdata";
+        Cursor cursor = db.rawQuery(sql,null);
+        while (cursor.moveToNext()) {
+            sb = new StringBuilder();
+            sb.append("insert into codedata(");
+            sb.append("note,id,password");
+            sb.append(")values(");
+            sb.append("'"+cursor.getString(1)+"',");
+            sb.append("'"+cursor.getString(2)+"',");
+            sb.append("'"+cursor.getString(3)+"'");
+            sb.append(")");
+            db.execSQL(sb.toString());
+        }
+    }
+}
+========================================================================================================================================
+
+========================================================================================================================================
+<drawable/addbtn.xml>
+----------------------------------------------------------------------------------------------------------------------------------------
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:tools="http://schemas.android.com/tools" xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true" android:drawable="@drawable/addclicked"/>
+    <item android:state_focused="true" android:drawable="@drawable/addclicked"/>
+    <item android:state_selected="true" android:drawable="@drawable/addbutton"/>
+    <item android:drawable="@drawable/addbutton"/>
+</selector>
+========================================================================================================================================
+
+========================================================================================================================================
+<drawable/addconfirmbtn.xml>
+----------------------------------------------------------------------------------------------------------------------------------------
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:tools="http://schemas.android.com/tools" xmlns:android="http://schemas.android.com/apk/res/android">
+  <item android:state_pressed="true" android:drawable="@drawable/addclicked"/>
+  <item android:state_focused="true" android:drawable="@drawable/addclicked"/>
+  <item android:state_selected="true" android:drawable="@drawable/addbutton"/>
+  <item android:drawable="@drawable/addbutton"/>
+</selector>
+========================================================================================================================================
+
+========================================================================================================================================
+<drawable/clearbtn.xml>
+----------------------------------------------------------------------------------------------------------------------------------------
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:tools="http://schemas.android.com/tools" xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true" android:drawable="@drawable/clearclicked"/>
+    <item android:state_focused="true" android:drawable="@drawable/clearclicked"/>
+    <item android:state_selected="true" android:drawable="@drawable/clearbutton"/>
+    <item android:drawable="@drawable/clearbutton"/>
+</selector>
+========================================================================================================================================
+
+========================================================================================================================================
+<drawable/closebtn.xml>
+----------------------------------------------------------------------------------------------------------------------------------------
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:tools="http://schemas.android.com/tools" xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true" android:drawable="@drawable/click"/>
+    <item android:state_focused="true" android:drawable="@drawable/click"/>
+    <item android:state_selected="true" android:drawable="@drawable/closebutton"/>
+    <item android:drawable="@drawable/closebutton"/>
+</selector>
+========================================================================================================================================
+
+========================================================================================================================================
+<drawable/closelistbtn.xml>
+----------------------------------------------------------------------------------------------------------------------------------------
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:tools="http://schemas.android.com/tools" xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true" android:drawable="@drawable/closelistclicked"/>
+    <item android:state_focused="true" android:drawable="@drawable/closelistclicked"/>
+    <item android:state_selected="true" android:drawable="@drawable/closelistbutton"/>
+    <item android:drawable="@drawable/closelistbutton"/>
+</selector>
+========================================================================================================================================
+
+========================================================================================================================================
+<drawable/deletebtn.xml>
+----------------------------------------------------------------------------------------------------------------------------------------
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:tools="http://schemas.android.com/tools" xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true" android:drawable="@drawable/deleteclicked"/>
+    <item android:state_focused="true" android:drawable="@drawable/deleteclicked"/>
+    <item android:state_selected="true" android:drawable="@drawable/deletebutton"/>
+    <item android:drawable="@drawable/deletebutton"/>
+</selector>
+========================================================================================================================================
+
+========================================================================================================================================
+<drawable/rowclick1.xml>
+----------------------------------------------------------------------------------------------------------------------------------------
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true" android:drawable="@drawable/rowbg1clicked"/>
+    <item android:state_focused="true" android:drawable="@drawable/rowbg1clicked"/>
+    <item android:state_selected="true" android:drawable="@drawable/rowbg1"/>
+    <item android:drawable="@drawable/rowbg1"/>
+</selector>
+========================================================================================================================================
+
+========================================================================================================================================
+<drawable/rowclick2.xml>
+----------------------------------------------------------------------------------------------------------------------------------------
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true" android:drawable="@drawable/rowbg2clicked"/>
+    <item android:state_focused="true" android:drawable="@drawable/rowbg2clicked"/>
+    <item android:state_selected="true" android:drawable="@drawable/rowbg2"/>
+    <item android:drawable="@drawable/rowbg2"/>
+</selector>
+========================================================================================================================================
+
+========================================================================================================================================
+<drawable/startbtn.xml>
+----------------------------------------------------------------------------------------------------------------------------------------
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+<item android:state_pressed="true" android:drawable="@drawable/click"/>
+<item android:state_focused="true" android:drawable="@drawable/click"/>
+<item android:state_selected="true" android:drawable="@drawable/startbutton"/>
+<item android:drawable="@drawable/startbutton"/>
+</selector>
+========================================================================================================================================
+
+========================================================================================================================================
+<drawable/updatebtn.xml>
+----------------------------------------------------------------------------------------------------------------------------------------
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:tools="http://schemas.android.com/tools" xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true" android:drawable="@drawable/changeclicked"/>
+    <item android:state_focused="true" android:drawable="@drawable/changeclicked"/>
+    <item android:state_selected="true" android:drawable="@drawable/changebutton"/>
+    <item android:drawable="@drawable/changebutton"/>
+</selector>
+========================================================================================================================================
+
