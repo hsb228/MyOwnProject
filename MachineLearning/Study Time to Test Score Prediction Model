@@ -1,0 +1,59 @@
+"""
+<Introduction>
+
+*A Simple Machine Learning Model I made based on what I learned on two week Machine Learning Class. 
+*Development Period: 2018.12.26 ~ 2019.1.7 (12 days)
+*Language: Python 3
+*IDE: Visual Studio 2017
+
+"""
+========================================================================================================================================
+<Source Code>
+
+import tensorflow as tf
+import numpy as np
+import os
+import matplotlib.pyplot as plt
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+
+#Load Datafiles to Analyze
+traindata = np.loadtxt("D:\ML/600train.csv",delimiter=',',dtype='float32')
+testdata = np.loadtxt("D:\ML/600test.csv",delimiter=',',dtype='float32')
+
+trainlength=len(traindata)
+testlength=len(testdata)
+
+#Seperating X and Y from Loaded DataFile
+x_train = traindata[0:trainlength:,0:-1]
+y_train = traindata[0:trainlength:,[-1]]
+x_test = testdata[0:testlength:,0:-1]
+y_test = testdata[0:testlength:,[-1]]
+
+#Placing Data
+X = tf.placeholder(tf.float32, shape=[None,1])
+Y = tf.placeholder(tf.float32, shape=[None,1])
+
+W = tf.Variable(tf.random_normal([1],name='weight'))
+b = tf.Variable(tf.random_normal([1],name='bias'))
+
+#Training Model(Linear Regression w/ GradientDescentOptimizer)
+hypothesis = W * X + b
+cost = tf.reduce_mean(tf.square(hypothesis-Y))
+optimizer = tf.train.GradientDescentOptimizer(learning_rate=5e-5)
+train = optimizer.minimize(cost)
+
+sess = tf.Session()
+sess.run(tf.global_variables_initializer())
+
+#Start Training
+for step in range(1501):
+    training=sess.run(train,feed_dict={X:x_train, Y:y_train})
+
+#Result of Training
+plt.figure(1)
+plt.scatter(x_test,y_test)
+plt.plot(x_test,sess.run(W)*x_test + sess.run(b),'b')
+plt.xlabel("Study Time")
+plt.ylabel("Test Score")
+plt.show()
+========================================================================================================================================
